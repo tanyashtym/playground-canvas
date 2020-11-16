@@ -1,0 +1,158 @@
+*{
+	font-family: "Lucida Console", Monaco, monospace;
+}
+
+#objectsTitle {
+	color: #FFFFFF;
+	font-size:17px;
+	text-align: center;
+	margin-top: 0px;
+	margin-bottom: 5px
+}
+
+/*#objectButtons{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}*/
+
+/** {
+  box-sizing: border-box;
+}
+
+
+*/#objectButtonsWrapper{
+	background-color: #ADD8E6;
+	width:50%;
+	padding:5px;
+	border-right: 10px;
+	margin-top:20px;
+}
+
+#btn_func{
+	border: 1px solid black; 
+	background-color: white;
+	border-radius: 10px;
+
+}
+#metricsTitle {
+	color: rgb(231,228,228);
+	font-size:17px;
+	text-align: center;
+	margin-top: 0px;
+	margin-bottom: 5px;
+}
+
+
+#label_n_cls{
+	color: white;
+}
+
+#n_classes{
+	border-radius: 8px;
+	background-color: white;
+
+}
+
+.column{
+	flex: 50%;
+}
+
+.row{
+	display: flex;
+}
+
+.right {
+	width: 25%;
+}
+
+#perform_metric{
+	margin-left: 30%;
+}
+
+.btn-group{
+	margin-left: 5%;
+	margin-top: 3%;
+}
+
+.btn-group .button {
+  background-color: #ADD8E6; /* Green */
+  border: 1px solid black;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+
+}
+
+.btn-group .button:not(:last-child) {
+  border-right: none; /* Prevent double borders */
+}
+
+.btn-group .button:hover {
+  background-color: #1aa3ff;
+}
+
+.button{
+	width: 30%;
+}
+
+#canvas{
+	position: relative;
+}
+
+
+.popup .overlay{
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 200vw;
+	height: 200vh;
+	background: rgba(0,0,0,0.7);
+	z-index: 1;
+	display: none;
+}
+
+.popup .content {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) scale(0);
+	background: #fff;
+	width: 650px;
+	height: 600px;
+	z-index:2;
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+.popup .close-btn{
+	cursor: pointer;
+	position: absolute;
+	right: 20px;
+	top: 20px;
+	width: 30px;
+	height: 30px;
+	background: #222;
+	color: #fff;
+	font-size: 25px;
+	font-weight: 600;
+	line-height: 30px;
+	text-align: center;
+	border-radius: 50%;
+}
+
+.popup.active .overlay{
+	display: block;
+}
+
+.popup.active .content{
+	transition:all 300ms ease-in-out;
+	transform: translate(-50%, -50%) scale(1);
+}

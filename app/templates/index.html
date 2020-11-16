@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Playground</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style type="text/css">
+		body {
+			margin: 0;
+		}
+	</style>
+</head>
+
+<body>
+	<div class ="row">
+		<div class = "colum left">
+			<canvas id = "canvas"  width="1000" height="800" style="border:1px solid #000000;"></canvas>
+			<div id = "objectButtonsWrapper">
+				<p id = "objectsTitle"><b>Objects</b></p>
+				<button id ="btn_func" onclick="createBbox(0)">Ground Truth</button>
+				<button id ="btn_func" onclick="createBbox(1)">Detection</button>
+				<button id ="btn_func" onclick="clearCanvas(canvas)">Clear</button>
+				<button id ="btn_func"onclick="makeJSONfiles(canvas)">JSON files</button>	
+				<br> <br>
+				<label id = "label_n_cls" for="n_classes"><b>Choose number of classes:</b></label>
+				<select id="n_classes" name="numberOfClasses">
+				  <option value="1">1</option>
+				  <option value="2">2</option>
+				  <option value="3">3</option>
+				</select>
+			</div>
+		</div>
+
+		<div class = "column right">
+			<h1 id = "perform_metric">Performance metrics</h1>
+			<div class = "popup " id = "popup-1">
+				<div class = "overlay"></div>
+				<div class = "content">
+					<div class = "close-btn" onclick="closePopup()">&times;</div>
+					<h3>Set the parameters:</h3>
+					<form  id = "form_edit" name = "form_edit" method = "post">
+					  <label id = "label_left" for="x_left_bbox" >Upper-left corner:</label>
+					  <input onfocus="this.value=''" type="text" id="x_left_bbox" name="x_left_bbox" value="Left">
+					  <input onfocus="this.value=''" type="text" id="y_top_bbox" name="y_top_bbox" value="Top"><br><br>
+
+					  <!-- variance for top-left corner -->
+
+					  <input onfocus="this.value=''" type="text" id="x_left_var" name="x_left_var" value="Sigma (left)">
+					  <input onfocus="this.value=''" type="text" id="y_top_var" name="y_top_var" value="Sigma (top)"><br><br>
+
+			
+					  <label id = "label_right" for="x_right_bbox" >Bottom-right corner:</label>
+					  <input onfocus="this.value=''" type="text" id="x_right_bbox" name="x_right_bbox" value="Right">
+					  <input onfocus="this.value=''" type="text" id="y_bottom_bbox" name="y_bottom_bbox" value="Bottom"><br><br>
+
+					  <!-- variance for bottom-right corner -->
+
+					   <input onfocus="this.value=''" type="text" id="x_right_var" name="x_right_var" value="Sigma (right)">
+					  <input onfocus="this.value=''" type="text" id="y_bottom_var" name="y_bottom_var" value="Sigma (bottom)"><br><br>
+
+					  <label  id = "label_gt_class" for="conf">Class:</label>
+					  <input onfocus="this.value=''" type="text" id="gt_class" name="class" value="Class"><br><br>
+
+					  <div id = "class_scores_div">
+
+					  	<label  id = "label_conf" for="conf">Class scores:</label>
+					  <!-- <input onfocus="this.value=''" type="text" id="conf" name="conf" value="Confidence"><br><br> -->
+
+					  </div>
+
+				<!-- 	  <label  id = "label_covar" for="conf">Covariance Matrix:</label>
+					  <input onfocus="this.value=''" type="text" id="covar" name="covar" value="Covariance Matrix"><br><br> -->
+
+					  <input type="button" id = "submit_edit" value="Submit" onclick="modifyParameters()">
+				</form>
+				</div>
+			</div>
+			
+			<div class = "row">
+				<div class = "column left btn-group">
+					<button class = "button" id = "mAPbutton" onclick="evaluateMethod(0)">mAP</button>
+					<button class = "button" onclick="evaluateMethod(1)">PDQ</button>
+					<button class = "button" onclick="calculateOurMethod()">Our method</button>			
+				</div>
+			</div>
+			<div id = "resultsSection">
+			</div>
+		</div>
+	</div>
+
+	<script src = "{{ url_for('static', filename='js/jscolor.js') }}"></script>
+	<script src = "{{ url_for('static', filename='js/utils.js') }}"></script>
+	<script src = "{{ url_for('static', filename='js/drawing.js') }}"></script>
+	<script src = "{{ url_for('static', filename='js/canvas.js') }}"></script>
+	<script src = "{{ url_for('static', filename='js/utils.js') }}"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</body>
+</html>
