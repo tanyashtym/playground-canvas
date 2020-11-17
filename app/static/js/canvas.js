@@ -193,6 +193,7 @@ function closePopup(){
 	div.classList.toggle("active");
 }
 
+
 function modifyParameters(e){
     // get the current button coordinates for editing
     var button = document.getElementById("button_edit");
@@ -210,6 +211,7 @@ function modifyParameters(e){
             break;
         }
     }
+    
     //get information about bbox assigned to the form
     var x_left = parseFloat(document.forms["form_edit"]["x_left_bbox"].value);
     var y_top = parseFloat(document.forms["form_edit"]["y_top_bbox"].value);

@@ -95,7 +95,7 @@ function createButton(e){
 					button.addEventListener ("click", function() {
 					
 					//if button is clicked, show modification form
-					togglePopup(r.isGT);
+					togglePopup(r);
 				})
 				break;
 			}
@@ -111,6 +111,28 @@ function updateButton(button, x, y){
 	console.log(x,y,button);
 	button.style.left = x + 'px';
 	button.style.top = y + 'px';
+}
+
+function displayCurrentValueParams(bbox){
+    //params: bbox - current bounding box.
+    document.forms["form_edit"]["x_left_bbox"].value = bbox.x;
+    document.forms["form_edit"]["y_top_bbox"].value = bbox.y;
+    document.forms["form_edit"]["x_right_bbox"].value = bbox.x + bbox.width;
+    document.forms["form_edit"]["y_bottom_bbox"].value = bbox.y + bbox.height;
+
+    if (bbox.isGT){
+        document.forms["form_edit"]["gt_class"].value = bbox.gtClass;
+    }
+    else{
+        document.forms["form_edit"]["x_left_var"].value = Math.sqrt(bbox.covars[0][0][0]);
+        document.forms["form_edit"]["y_top_var"].value = Math.sqrt(bbox.covars[0][1][1]);
+        document.forms["form_edit"]["x_right_var"].value = Math.sqrt(covars[1][0][0]);
+        document.forms["form_edit"]["x_right_var"].value = Math.sqrt(covars[1][1][1]);
+        for (i = 0; i < n_classes + 1; i++){
+           document.forms["form_edit"]["class_" + i].value = bbox.confidences[i];
+        }
+
+    }
 }
 
 function drawClassLabel(lx, ty, rx, by, classLbl){
@@ -162,7 +184,7 @@ function drawScoreLabel(lx, ty, rx, by, prob, lbl){
 	ctx.fillText(lbl,lx + 10, by -10);
 }
 
-function togglePopup(isGT){
+function togglePopup(r){
 	//function to create from for modification
 	//@params: isGT - boolean, True if box is ground truth
 
@@ -171,7 +193,7 @@ function togglePopup(isGT){
 	n_classes = parseInt(document.getElementById('n_classes').value);
 	
 
-	if (isGT) {
+	if (r.isGT) {
 
 		//if it is ground truth bbox,some of the fields are hidden (label confidence), but we can set ground truth label
 		document.getElementById("label_conf").style.visibility = "hidden";
@@ -213,5 +235,28 @@ function togglePopup(isGT){
 		}
 	}
 
+	displayCurrentValueParams(r);
+
 }
 
+function displayCurrentValueParams(bbox){
+    //params: bbox - current bounding box.
+    document.forms["form_edit"]["x_left_bbox"].value = bbox.x;
+    document.forms["form_edit"]["y_top_bbox"].value = bbox.y;
+    document.forms["form_edit"]["x_right_bbox"].value = bbox.x + bbox.width;
+    document.forms["form_edit"]["y_bottom_bbox"].value = bbox.y + bbox.height;
+
+    if (bbox.isGT){
+        document.forms["form_edit"]["gt_class"].value = bbox.gtClass;
+    }
+    else{
+        document.forms["form_edit"]["x_left_var"].value = Math.sqrt(bbox.covars[0][0][0]);
+        document.forms["form_edit"]["y_top_var"].value = Math.sqrt(bbox.covars[0][1][1]);
+        document.forms["form_edit"]["x_right_var"].value = Math.sqrt(bbox.covars[1][0][0]);
+        document.forms["form_edit"]["y_bottom_var"].value = Math.sqrt(bbox.covars[1][1][1]);
+        for (i = 0; i < n_classes + 1; i++){
+           document.forms["form_edit"]["class_" + i].value = bbox.confidences[i];
+        }
+
+    }
+}
