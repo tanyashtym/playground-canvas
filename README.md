@@ -1,2 +1,2 @@
-# playground-canvas
+# Playground
 Playground for object detection performance metrics 
