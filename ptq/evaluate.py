@@ -26,7 +26,7 @@ class ParamSequenceHolder:
         self._gt_instances_lists = gt_instances_lists
         self._det_instances_lists = det_instances_lists
 
-        print("self.gt = ", self._gt_instances_lists)
+        #print("self.gt = ", self._gt_instances_lists)
 
     def __len__(self):
         length = np.sum([len(gt_list) for gt_list in self._gt_instances_lists])
@@ -36,7 +36,7 @@ class ParamSequenceHolder:
         for idx in range(len(self._gt_instances_lists)):
             gt_list = self._gt_instances_lists[idx]
             det_list = self._det_instances_lists[idx]
-            print("gt_list = ", gt_list)
+            #print("gt_list = ", gt_list)
             # Check the lists are the same length
             if len(gt_list) != len(det_list):
                 raise ValueError('gt_list and det_list for sequence {0} not the same length\n'
@@ -44,11 +44,11 @@ class ParamSequenceHolder:
                                  'length Det {2}'.format(idx, len(gt_list), len(det_list)))
 
             for frame_gt, frame_detections in zip(gt_list, det_list):
-                print("frame_gt = ", frame_gt,frame_detections)
+                #print("frame_gt = ", frame_gt,frame_detections)
                 ground_truth = list(frame_gt)
-                print("ground_truth= ", ground_truth)
+                #print("ground_truth= ", ground_truth)
                 detections = list(frame_detections)
-                print("detections = ", detections)
+                #print("detections = ", detections)
                 yield ground_truth, detections
 
 
@@ -79,7 +79,7 @@ def gen_param_sequence():
     all_gt_instances = [gt_instances]
     all_det_instances = [det_instances]
 
-    print("all_gt = ", all_gt_instances[0], all_det_instances)
+    #print("all_gt = ", all_gt_instances[0], all_det_instances)
     param_sequence = ParamSequenceHolder(all_gt_instances, all_det_instances)
     len_sequences = [len(all_gt_instances[idx]) for idx in range(len(all_gt_instances))]
 
@@ -119,10 +119,10 @@ def main(method, n_classes):
     #Calculate mAP
     if (method == 0):
         print("Calculating mAP")
-        print("Extracting GT and Detections")
+        #print("Extracting GT and Detections")
         param_sequence, len_sequences = gen_param_sequence()     
         mAP = coco_mAP(param_sequence, n_classes, use_heatmap=False)
-        print("MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP ", mAP)
+        #print("MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP ", mAP)
         return mAP
 
     

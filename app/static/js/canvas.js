@@ -69,7 +69,7 @@ function createBbox(opt){
 		box.stroke = "#ff3300";
 		box.id = pred_id;
 		box.isGT = false;
-        box.covars = [[[0, 0], [0, 0]], [[0, 0], [0, 0]]];
+        box.covars = [[[100, 0], [0, 100]], [[100, 0], [0, 100]]];
 		rect_preds.push(box);
 		pred_id = pred_id + 1;
         box.confidences = [] //add class confidences + obj score (0.2)
@@ -283,6 +283,14 @@ function evaluateMethod(opt){
     var div = document.getElementById("resultsSection");
     div.appendChild(pdq);
 
+    //drawProbabilityTensors();
+    draw();
 
-draw()
+}
+
+async function vizualizeUncertainty(){
+    var n_classes = parseInt(document.getElementById('n_classes').value); //number of classes
+    await pass_values_uncertainty(0, n_classes);
+    await getProbTensors();
+    //draw();
 }

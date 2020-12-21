@@ -1,12 +1,14 @@
 function rect(x, y, w, h, color) {
     ctx.beginPath();
     ctx.strokeStyle = color;
+    ctx.globalAlpha = 1.0;
     ctx.strokeRect(x, y, w, h);
     ctx.closePath();
 }
 
 // clear the canvas
 function clear() {
+	ctx.globalAlpha = 1.0;
 	ctx.fillStyle = "#000000";
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
 }
@@ -37,6 +39,8 @@ function draw(){
 	//@params:
 	//opt (int) - type of bbox (0 - gt, 1 - prediction)
 
+	ctx.globalAlpha = 1.0;
+
 	clear();
 	drawGrid(WIDTH, HEIGHT);
 	rect(0,0,WIDTH,HEIGHT);
@@ -52,8 +56,14 @@ function draw(){
     		if (r.class && r.score){
     			drawScoreLabel(r.x, r.y, r.x + r.width, r.y + r.height, r.score, r.class);
     		}
+    		//console.log(r.probs);
+    		//if (r.probs){
+    		//	drawProbabilityTensors(r.probs);
+    		//}
     	}
     }
+
+    //drawProbabilityTensors()
 }
 
 function createButton(e){
@@ -258,5 +268,125 @@ function displayCurrentValueParams(bbox){
            document.forms["form_edit"]["class_" + i].value = bbox.confidences[i];
         }
 
+    }
+}
+
+function drawProbabilityTensors(probs){
+
+	//draw probabilities based on Markus code 
+
+	color1 = '#f02c02'; // 0.7 - 1
+	color2 = '#e75b3d'; // 0.3 - 0.7
+	color3 = "#ffe0d9"; // 0 - 0.3
+
+	max1_i = -999;
+	max1_j = -999;
+	min1_i = 100000;
+	min1_j = 100000;
+
+	max2_i = -999;
+	max2_j = -999;
+	min2_i = 100000;
+	min2_j = 100000;
+
+	max3_i = -999;
+	max3_j = -999;
+	min3_i = 100000;
+	min3_j = 100000;
+
+	for (var i = 0; i < HEIGHT; i=i+1){
+		for (var j = 0; j < WIDTH; j=j+1){
+			// if (probs[i][j] <= 0.3){
+			// 	if (i < min1_i) {
+			// 		min1_i = i
+			// 	}
+			// 	if (i > max1_i){
+			// 		max1_i = i
+			// 	}
+			// 	if (j < min1_j) {
+			// 		min1_j = j
+			// 	}
+			// 	if (j > max1_j){
+			// 		max1_j = j
+			// 	}
+			// 	//console.log("Hey1")
+			// 	//ctx.fillStyle = color3;
+			// 	//ctx.fillRect(i,j,1,1);
+			// }
+			if (probs[i][j] > 0.3 && probs[i][j] <= 0.7){
+				if (i < min2_i) {
+					min2_i = i
+				}
+				if (i > max2_i){
+					max2_i = i
+				}
+				if (j < min2_j) {
+					min2_j = j
+				}
+				if (j > max2_j){
+					max2_j = j
+				}
+				//console.log("Hey2")
+				//ctx.fillStyle = color2;
+				//ctx.fillRect(i,j,1,1);
+			}
+			if (probs[i][j] > 0.7){
+				if (i < min3_i) {
+					min3_i = i
+				}
+				if (i > max3_i){
+					max3_i = i
+				}
+				if (j < min3_j) {
+					min3_j = j
+				}
+				if (j > max3_j){
+					max3_j = j
+				}
+				//console.log("Hey3")
+				//ctx.fillStyle = color1;
+				//ctx.fillRect(i,j,1,1);
+			}
+			
+		}
+	}
+
+	// ctx.globalAlpha = 0.2;
+	// ctx.fillStyle = color3;
+	// ctx.fillRect(min1_j,min1_i,max1_j-min1_j,max1_i-min1_i);
+
+	console.log(min2_i, min2_j, max2_i, max2_j)
+	console.log(min3_i, min3_j, max3_i, max3_j)
+
+	ctx.globalAlpha = 0.2;
+	ctx.fillStyle = color2;
+	ctx.fillRect(min2_j,min2_i,max2_j-min2_j,max2_i-min2_i);
+
+	ctx.globalAlpha = 0.2;
+	ctx.fillStyle = color1;
+	ctx.fillRect(min3_j,min3_i,max3_j-min3_j,max3_i-min3_i);
+
+}
+
+function clearCanvas(){
+	ctx.globalAlpha = 1.0;
+
+	clear();
+	drawGrid(WIDTH, HEIGHT);
+	rect(0,0,WIDTH,HEIGHT);
+
+	// redraw each rect in the rects[] array
+	for (var i = 0; i < rects.length; i++) {
+        var r = rects[i];
+        rect(r.x, r.y, r.width, r.height, r.stroke);
+        if (r.isGT){
+        	drawClassLabel(r.x, r.y, r.x + r.width, r.y + r.height, r.gtClass)
+    	} else {
+    		drawUncertainty(r.x, r.y, r.x + r.width, r.y + r.height, r.covars);
+    		if (r.class && r.score){
+    			drawScoreLabel(r.x, r.y, r.x + r.width, r.y + r.height, r.score, r.class);
+    		}
+
+    	}
     }
 }

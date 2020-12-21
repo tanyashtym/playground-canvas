@@ -83,7 +83,7 @@ function pass_values(methodOpt,n_classes) {
 	//@params: methodOpt -  which method to use: (0 - mAP, 1 - PDQ, 2 - our method)
 	//		   n_classes - number of classes
 
-
+	//window.location.reload(true);
 	//get GT and Preds in the format suitable for PDQ-evaluation
 	dicts = createDicts(rect_gts, rect_preds); //return dicts
 	gt_dict = dicts[0]; 
@@ -93,7 +93,7 @@ function pass_values(methodOpt,n_classes) {
 	fetch(`${window.origin}/index/pass_val`,{
 		method: 'POST',
 		credentials: 'include',
-		body: JSON.stringify([gt_dict, pred_dict, methodOpt, n_classes + 1]), //we pass gt, preds, method option and number of classes to python script
+		body: JSON.stringify([gt_dict, pred_dict, methodOpt, n_classes + 1, 1]), //we pass gt, preds, method option and number of classes to python script
 		cache: 'no-cache',
 		headers: new Headers({
 			"content-type": 'application/json'
@@ -120,4 +120,66 @@ function pass_values(methodOpt,n_classes) {
 
 		});
 	});
+
+}
+
+//CHANGE THIS TO STH!
+
+async function pass_values_uncertainty(methodOpt,n_classes) {
+	//function that "connects" JS and Python
+	//@params: methodOpt -  which method to use: (0 - mAP, 1 - PDQ, 2 - our method)
+	//		   n_classes - number of classes
+
+	//window.location.reload(true);
+	//get GT and Preds in the format suitable for PDQ-evaluation
+	dicts = createDicts(rect_gts, rect_preds); //return dicts
+	gt_dict = dicts[0]; 
+	pred_dict = dicts[1];
+
+	//FLASK 
+	return fetch(`${window.origin}/index/pass_val`,{
+		method: 'POST',
+		credentials: 'include',
+		body: JSON.stringify([gt_dict, pred_dict, methodOpt, n_classes + 1, 0]), //we pass gt, preds, method option and number of classes to python script
+		cache: 'no-cache',
+		headers: new Headers({
+			"content-type": 'application/json'
+		})
+	})
+
+	//getProbTensors();
+}
+
+async function getProbTensors(){
+	for (var i=0; i < rect_preds.length; i++){
+		//console.log("I ========== ", i);
+        filename = 'static/js/'.concat('det'.concat(i.toString().concat('.txt')));
+        probs = [];
+        console.log(filename);
+
+        let data = await fetchData(filename);//.then(arr => console.log(arr));
+        console.log("ok data", filename);
+        lines = data.split('\n');
+
+        for (var line=0; line<lines.length - 1; line++){
+            probStrings = lines[line].split(' ');
+            probInts = [];
+            for (var p = 0; p < probStrings.length; p++){
+                probInts.push(parseFloat(probStrings[p]));
+            }
+            
+            probs.push(probInts);
+
+        }
+        drawProbabilityTensors(probs);
+        rect_preds[i].probs = probs; 
+        //console.log(rect_preds[i].probs)
+      }
+      console.log("OK RETURN");
+      return;
+}
+
+function fetchData(filename){
+return fetch(filename, {cache: 'no-cache'})
+          .then(response => response.text())
 }
