@@ -10,8 +10,11 @@ import rvc1_gt_loader
 import rvc1_submission_loader
 #from coco_LRP import coco_LRP
 
-if (open('gt.json')):
-    coco_gt_file = json.load(open('gt.json'))
+try:
+    gt_file = open('gt.json')
+    coco_gt_file = json.load(gt_file)
+except IOError:
+    print("File not accessible!")
 
 class ParamSequenceHolder:
     def __init__(self, gt_instances_lists, det_instances_lists):
