@@ -10,7 +10,8 @@ import rvc1_gt_loader
 import rvc1_submission_loader
 #from coco_LRP import coco_LRP
 
-coco_gt_file = json.load(open('gt.json'))
+if (open('gt.json')):
+    coco_gt_file = json.load(open('gt.json'))
 
 class ParamSequenceHolder:
     def __init__(self, gt_instances_lists, det_instances_lists):
