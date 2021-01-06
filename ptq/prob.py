@@ -7,41 +7,15 @@ import matplotlib.patches as patches
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.stats import multivariate_normal, norm
 import json 
+import time
 
 def getTensors():
 	filename = "pred.json"
 	f = open(filename)
 	preds = json.load(f)
 	img_size = (1000, 800) # WH
-	prob_tensor = get_prob_tensor(preds, img_size, n = 1)
+	prob_tensor = get_prob_tensor(preds, img_size, n = 2)
 
-	#Probability of nothing = (1 - b1_prob)(1 - b2_prob)... 
-	#Normalize by prob of none - sum all the probabilities together (multiplied by probability vectors) 
-	#and then normalize it by (1-p_none)
-
-	p_none = np.product((1 - prob_tensor), axis=2)
-	p_other = 1 - p_none
-	p_norm = np.sum(prob_tensor, axis=2)
-
-	# Where comes in objectness?
-
-	nr_classes = len(preds["detections"][0][0]["label_probs"])
-	p_classwise = np.zeros(shape=(*p_none.shape, nr_classes+1))
-
-	# Fill in all the class probabilities
-	for i, det in enumerate(preds["detections"][0]):
-	    probs_class = det["label_probs"]
-	    
-	    for j, p in enumerate(probs_class):  # Make this better
-	        p_classwise[:, :, j] += prob_tensor[:, :, i]*p  # For detection_i, add probabilities for class_j
-
-	# Add p_none
-	p_classwise[:, :, -1] = p_none
-	        
-	# Normalize the probs
-	for i in range(p_classwise.shape[-1] - 1): # No need to normalize p_none
-	    p_classwise[:,:,i] = p_classwise[:,:,i]*p_other/(p_norm + 1e-24)
-	
 	return prob_tensor
 
 def prob_point_in_bbox(XY, F1, F2, is_in = True):
@@ -62,27 +36,62 @@ def prob_point_in_bbox(XY, F1, F2, is_in = True):
     else:
         return 1 - probs
 
-def get_prob_tensor(preds, img_size, n = 1): # Slow.., need to make it faster,
+def get_prob_tensor(preds, img_size, n = 1):
+    """
+    Inputs:
+        preds (json) - input json of predictions (detections)
+        img_size (tuple) - the size of the image
+        n (int) - over how many pixels a probability is found.
+    """
     
     nr_dets = len(preds["detections"][0])
-    prob_tensor = np.zeros(shape=[img_size[1]//n, img_size[0]//n, nr_dets])
+    prob_tensor = np.zeros(shape=[img_size[1], img_size[0], nr_dets])
 
     X = np.linspace(0, img_size[0], img_size[0]//n)
-    Y = np.linspace(0, img_size[1], img_size[1]//n)  # Atm works only for square
+    Y = np.linspace(0, img_size[1], img_size[1]//n)
     XY = np.meshgrid(X, Y)
-    
+
     for i, det in enumerate(preds["detections"][0]):
         bbox = det["bbox"]
         covars = det["covars"]
         bbox_c = bbox.copy()
-
         bbox_c[1] = img_size[1] - bbox[1]
         bbox_c[3] = img_size[1] - bbox[3]
-        print(bbox_c)
         
+        bbox_c[1] = img_size[1] - bbox[1]  # Invert y-axis
+        bbox_c[3] = img_size[1] - bbox[3]
+        # Padding of bbox based on covariance
+        bbox_pad = np.array([-np.sqrt(covars)[0][0][0], np.sqrt(covars)[0][1][1], np.sqrt(covars)[1][0][0], -np.sqrt(covars)[1][1][1]])*2
+        bbox_padded = np.array((bbox_c + bbox_pad), dtype=np.int)
+        
+        if (bbox_padded[2]-bbox_padded[0]) % n != 0 or (bbox_padded[1]-bbox_padded[3]) % n != 0:
+            print("The image size is not divisible by n, use n = 1 instead")
+            n = 1
+
+        # Check if padding is inside of the bounds
+        bbox_padded = [max(0, bbox_padded[0]), min(img_size[1], bbox_padded[1]), min(img_size[0], bbox_padded[2]), max(0, bbox_padded[3])]
+            
+        X = np.linspace(bbox_padded[0], bbox_padded[2], (bbox_padded[2]-bbox_padded[0])//n)
+        Y = np.linspace(bbox_padded[1], bbox_padded[3], (bbox_padded[1]-bbox_padded[3])//n)
+        XY = np.meshgrid(X, Y)
+
+        print(bbox_c)
+        print(bbox_padded)
+
         F1 = multivariate_normal(bbox_c[:2], covars[0])
         F2 = multivariate_normal(bbox_c[2:], covars[1])
-        prob_tensor[:, :, i] = np.flip(np.reshape(prob_point_in_bbox(XY, F1, F2), XY[0].shape), axis=0)
+        
+        
+        start_time = time.time()
+        probs = np.reshape(prob_point_in_bbox(XY, F1, F2), XY[0].shape)
+        #probs = np.flip(np.reshape(prob_point_in_bbox(XY, F1, F2), XY[0].shape), axis=0)
+        # Repeat each element n-times
+        probs = np.repeat(probs, n, axis=0)
+        probs = np.repeat(probs, n, axis=1)
+
+        prob_tensor[(img_size[1] - bbox_padded[1]):(img_size[1] - bbox_padded[3]), bbox_padded[0]:bbox_padded[2], i] = probs
+        
+        print("Time taken:", time.time() - start_time)
         
     return prob_tensor
 
