@@ -273,98 +273,22 @@ function displayCurrentValueParams(bbox){
 
 function drawProbabilityTensors(probs){
 
-	//draw probabilities based on Markus code 
+	//vizualize uncertainty
 
-	color1 = '#f02c02'; // 0.7 - 1
-	color2 = '#e75b3d'; // 0.3 - 0.7
-	color3 = "#ffe0d9"; // 0 - 0.3
-
-	max1_i = -999;
-	max1_j = -999;
-	min1_i = 100000;
-	min1_j = 100000;
-
-	max2_i = -999;
-	max2_j = -999;
-	min2_i = 100000;
-	min2_j = 100000;
-
-	max3_i = -999;
-	max3_j = -999;
-	min3_i = 100000;
-	min3_j = 100000;
+	colors = ["#ffe6e6",'#ffe6e6', '#ffcccc', ' #ffb3b3', '#ff9999', '#ff8080', ' #ff6666', '#ff4d4d', '#ff3333', ' #ff1a1a', '#ff0000'] // < 0.1, < 0.2, <0.3, <0.4, <0.5, <0.5, <0.6, <0.7, <0.8, <0.9, <1
+	values = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
 	for (var i = 0; i < HEIGHT; i=i+1){
 		for (var j = 0; j < WIDTH; j=j+1){
-			// if (probs[i][j] <= 0.3){
-			// 	if (i < min1_i) {
-			// 		min1_i = i
-			// 	}
-			// 	if (i > max1_i){
-			// 		max1_i = i
-			// 	}
-			// 	if (j < min1_j) {
-			// 		min1_j = j
-			// 	}
-			// 	if (j > max1_j){
-			// 		max1_j = j
-			// 	}
-			// 	//console.log("Hey1")
-			// 	//ctx.fillStyle = color3;
-			// 	//ctx.fillRect(i,j,1,1);
-			// }
-			if (probs[i][j] > 0.3 && probs[i][j] <= 0.7){
-				if (i < min2_i) {
-					min2_i = i
+			for (var k = 0; k < values.length-1; k=k+1){
+				if (probs[i][j]>values[k] && probs[i][j]<=values[k+1]){
+					ctx.globalAlpha = 0.5;
+					ctx.fillStyle = colors[k];
+					ctx.fillRect(j,i,1,1);
 				}
-				if (i > max2_i){
-					max2_i = i
-				}
-				if (j < min2_j) {
-					min2_j = j
-				}
-				if (j > max2_j){
-					max2_j = j
-				}
-				//console.log("Hey2")
-				//ctx.fillStyle = color2;
-				//ctx.fillRect(i,j,1,1);
 			}
-			if (probs[i][j] > 0.7){
-				if (i < min3_i) {
-					min3_i = i
-				}
-				if (i > max3_i){
-					max3_i = i
-				}
-				if (j < min3_j) {
-					min3_j = j
-				}
-				if (j > max3_j){
-					max3_j = j
-				}
-				//console.log("Hey3")
-				//ctx.fillStyle = color1;
-				//ctx.fillRect(i,j,1,1);
-			}
-			
 		}
 	}
-
-	// ctx.globalAlpha = 0.2;
-	// ctx.fillStyle = color3;
-	// ctx.fillRect(min1_j,min1_i,max1_j-min1_j,max1_i-min1_i);
-
-	console.log(min2_i, min2_j, max2_i, max2_j)
-	console.log(min3_i, min3_j, max3_i, max3_j)
-
-	ctx.globalAlpha = 0.2;
-	ctx.fillStyle = color2;
-	ctx.fillRect(min2_j,min2_i,max2_j-min2_j,max2_i-min2_i);
-
-	ctx.globalAlpha = 0.2;
-	ctx.fillStyle = color1;
-	ctx.fillRect(min3_j,min3_i,max3_j-min3_j,max3_i-min3_i);
 
 }
 
