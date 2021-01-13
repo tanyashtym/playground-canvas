@@ -292,5 +292,11 @@ async function vizualizeUncertainty(){
     var n_classes = parseInt(document.getElementById('n_classes').value); //number of classes
     await pass_values_uncertainty(0, n_classes);
     await getProbTensors();
+
     //draw();
+}
+
+async function importFile(){
+    await getBboxFromJSON();
+    draw();
 }

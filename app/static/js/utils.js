@@ -157,7 +157,7 @@ async function getProbTensors(){
         probs = [];
         console.log(filename);
 
-        let data = await fetchData(filename);//.then(arr => console.log(arr));
+        let data = await fetchTextData(filename);//.then(arr => console.log(arr));
         console.log("ok data", filename);
         lines = data.split('\n');
 
@@ -179,7 +179,82 @@ async function getProbTensors(){
       return;
 }
 
-function fetchData(filename){
+function fetchTextData(filename){
 return fetch(filename, {cache: 'no-cache'})
           .then(response => response.text())
+}
+
+
+function GTfromJSON(data){
+	annotations = data['annotations']; //array of dictionaries
+	for (var i = 0; i < annotations.length; i = i + 1){
+		//segmentation = annotations[i]['segmentation'];
+		bbox = annotations[i]['bbox'];
+		category = annotations[i]['category_id'];
+
+		var box = {
+			x: bbox[0],
+			y: bbox[1],
+			width: bbox[2],
+			height: bbox[3],
+			stroke: "#009933",
+			gtClass: category,
+			isGT: true,
+			id: i,
+			hasButton: false,
+			isDragging: false
+		}
+
+		rect_gts.push(box);
+		rects.push(box);
+	}
+}
+
+function predFromJSON(data){
+
+	detections = data['detections'][0];
+	for (var i = 0; i < detections.length; i = i + 1){
+		bbox = detections[i]['bbox'];
+		cvar = detections[i]['covars'];
+		label_probs = detections[i]['label_probs'];
+
+		var box = {
+			x: bbox[0],
+			y: bbox[1],
+			width: bbox[2] - bbox[0],
+			height: bbox[3] - bbox[1],
+			stroke: "#ff3300",
+			isGT: false,
+			covars: cvar,
+			confidences: label_probs,
+			id: i,
+			hasButton: false,
+			isDragging: false
+		}
+		rect_preds.push(box);
+		rects.push(box);
+
+	}
+}
+
+
+
+async function getBboxFromJSON(){
+	files = ['static/json/gt.json', 'static/json/pred.json'];
+	for (var i = 0; i < files.length; i=i+1){
+		console.log(rects);
+		// 1 - GT objects, 2 - predictions (RVC1)
+		let data = await fetchJSONdata(files[i]);
+		if(i === 0) { //if GT
+			GTfromJSON(data);
+		}
+		else { //if predictions
+			predFromJSON(data);
+		}
+	}
+}
+
+function fetchJSONdata(filename){
+return fetch(filename, {cache: 'no-cache'})
+          .then(response => response.json())
 }
